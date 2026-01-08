@@ -1,0 +1,7 @@
+rend/
+__pycache__/
+*.png
+*.npy
+*.zip
+.DS_Store
+out/
