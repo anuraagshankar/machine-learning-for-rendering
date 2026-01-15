@@ -8,6 +8,30 @@ from random import randint
 # The integrators also act like a scene class in that-
 # it stores all the primitives that are to be ray traced.
 # -------------------------------------------------
+
+import math
+
+def get_circle_points(cam_width, cam_height, radius, num_points=100):
+    # 1. Calculate the center of the rectangle
+    center_x = cam_width / 2
+    center_y = cam_height / 2
+    
+    points = []
+    
+    # 2. Generate points around the circumference
+    for i in range(num_points):
+        # Calculate the angle in radians (0 to 2*pi)
+        angle = 2 * math.pi * i / num_points
+        
+        # Calculate x and y coordinates
+        x = center_x + radius * math.cos(angle)
+        y = center_y + radius * math.sin(angle)
+        
+        points.append((int(x), int(y)))
+        
+    return points
+
+
 class Integrator(ABC):
     # Initializer - creates object list
     def __init__(self, filename_, experiment_name=''):
@@ -36,10 +60,25 @@ class Integrator(ABC):
         print('Rendering Image: ' + self.get_filename())
         for x in range(0, cam.width):
             for y in range(0, cam.height):
-                pixel = GREEN
+                # pixel = GREEN
+                rng = np.random.rand
+                pixel = RGBColor(rng(), rng(), rng())
                 self.scene.set_pixel(pixel, x, y)  # save pixel to pixel array
             progress = (x / cam.width) * 100
             print('\r\tProgress: ' + str(progress) + '%', end='')
+
+        face_circle = get_circle_points(cam.width, cam.height, cam.width//2 - 20, 5000)
+        eye_circle = get_circle_points(cam.width, cam.height, 50, 500)
+        eye_1 = [(x-cam.width//6, y-cam.height//6) for x, y in eye_circle]
+        eye_2 = [(x+cam.width//6, y-cam.height//6) for x, y in eye_circle]
+        mouth_circle = get_circle_points(cam.width, cam.height, cam.width//3, 1000)
+        mouth_circle = [pt for pt in mouth_circle if pt[1] > cam.height//2 + 100]
+
+        all_points = face_circle + eye_1 + eye_2 + mouth_circle
+
+        for point in all_points:
+            self.scene.set_pixel(RGBColor(0, 0, 0), point[0], point[1])
+
         # save image to file
         print('\r\tProgress: 100% \n\t', end='')
         full_filename = self.get_filename()
