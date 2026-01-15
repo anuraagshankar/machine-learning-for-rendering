@@ -36,7 +36,9 @@ class Integrator(ABC):
         print('Rendering Image: ' + self.get_filename())
         for x in range(0, cam.width):
             for y in range(0, cam.height):
-                pixel = RGBColor(x / cam.width, y / cam.height, 0)
+                direction = cam.get_direction(x, y)
+                ray = Ray(direction=direction)
+                pixel = self.compute_color(ray)
                 self.scene.set_pixel(pixel, x, y)  # save pixel to pixel array
             progress = (x / cam.width) * 100
             print('\r\tProgress: ' + str(progress) + '%', end='')
@@ -61,7 +63,7 @@ class IntersectionIntegrator(Integrator):
 
     def compute_color(self, ray):
         # ASSIGNMENT 1.2: PUT YOUR CODE HERE
-        pass
+        return RED if self.scene.any_hit(ray) else BLACK
 
 
 class DepthIntegrator(Integrator):
