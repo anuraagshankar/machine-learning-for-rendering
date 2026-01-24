@@ -38,6 +38,9 @@ class Vector3D:
     def __repr__(self):
         return f'Vector3D({self.x}, {self.y}, {self.z})'
 
+    def multiply(self, v):
+        return Vector3D(self.x * v.x, self.y * v.y, self.z * v.z)
+
 
 # Return dot product between two vectors
 def Dot(a, b):

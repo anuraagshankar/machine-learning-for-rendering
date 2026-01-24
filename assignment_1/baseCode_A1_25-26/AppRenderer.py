@@ -47,7 +47,7 @@ def sphere_scene(envMap=None):
     return scene_
 
 # --------------------------------------------------Set up variables
-FILENAME = 'normal'
+FILENAME = 'phong'
 DIRECTORY = 'out/'
 #env_map_path = 'env_maps/black_and_white.hdr'
 #env_map_path = 'env_maps/outdoor_umbrellas_4k.hdr'
@@ -56,7 +56,7 @@ env_map_path = 'env_maps/arch_nozero.hdr'
 
 # -------------------------------------------------Main
 # Create Integrator
-integrator = NormalIntegrator(DIRECTORY + FILENAME)
+integrator = PhongIntegrator(DIRECTORY + FILENAME)
 
 # Create the scene
 scene = sphere_scene(envMap=env_map_path)

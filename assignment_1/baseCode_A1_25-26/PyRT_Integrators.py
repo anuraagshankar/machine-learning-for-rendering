@@ -109,7 +109,46 @@ class PhongIntegrator(Integrator):
 
     def compute_color(self, ray):
         # ASSIGNMENT 1.4: PUT YOUR CODE HERE
-        pass
+        hit_data = self.scene.closest_hit(ray)
+
+        if not hit_data.has_hit:
+            return BLACK
+
+        hit_object = self.scene.object_list[hit_data.primitive_index]
+
+        # Coefficients
+        kd = hit_object.get_BRDF().kd
+        ks = kd # Keeping it the same for now
+        shininess = 1
+
+        # Light source details
+        light_source = self.scene.pointLights[0]
+        light_vec = light_source.pos - hit_data.hit_point
+        dist_from_light = Length(light_vec)
+        incident_intensity = light_source.intensity / dist_from_light**2
+
+        # Unit vectors for Phong lighting equations
+        normal = Normalize(hit_data.normal)
+        w_i = Normalize(light_vec)
+        w_o = Normalize(ray.d * -1.0)
+
+        # Ambient light = kd * i_a
+        ambient_light = kd.multiply(self.scene.i_a)
+
+        # Shadow check
+        shadow_ray = Ray(hit_data.hit_point, w_i, dist_from_light)
+        if self.scene.any_hit(shadow_ray):
+            return ambient_light
+        
+        # Diffuse light = kd * I / d^2 * max(0, n.l)
+        diffuse_light = kd.multiply(incident_intensity) * max(0, Dot(normal, w_i))
+        
+        # Specular light = ks * I / d^2 * max(0, r.w_o)^s
+        two_n_dot_l = 2.0 * Dot(normal, w_i)
+        r = Normalize(normal * two_n_dot_l - w_i) # r = 2 * n.l * n - w_i
+        specular_light = ks.multiply(incident_intensity) * max(0, Dot(w_o, r)) ** shininess
+
+        return ambient_light + diffuse_light + specular_light
 
 
 class CMCIntegrator(Integrator):  # Classic Monte Carlo Integrator
