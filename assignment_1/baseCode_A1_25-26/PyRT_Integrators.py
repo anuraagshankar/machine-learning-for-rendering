@@ -74,7 +74,14 @@ class DepthIntegrator(Integrator):
 
     def compute_color(self, ray):
         # ASSIGNMENT 1.3: PUT YOUR CODE HERE
-        pass
+        hit_data = self.scene.closest_hit(ray)
+        
+        if not hit_data.has_hit:
+            return BLACK
+
+        depth_color = 1 - (hit_data.hit_distance / self.max_depth)
+        depth_color = max(0, depth_color)
+        return RGBColor(depth_color, depth_color, depth_color)
 
 
 class NormalIntegrator(Integrator):
