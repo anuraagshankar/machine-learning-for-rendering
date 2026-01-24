@@ -141,6 +141,8 @@ WHITE = RGBColor(1.0, 1.0, 1.0)
 GREEN = RGBColor(0.0, 1.0, 0.0)
 RED = RGBColor(1.0, 0.0, 0.0)  # for testing
 
+ONE = Vector3D(1, 1, 1)
+
 
 # ------------------------------------------------- Free Functions
 # Return normal that is pointing on the side as the passed direction

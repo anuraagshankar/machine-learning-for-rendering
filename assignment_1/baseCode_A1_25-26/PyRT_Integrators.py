@@ -91,7 +91,15 @@ class NormalIntegrator(Integrator):
 
     def compute_color(self, ray):
         # ASSIGNMENT 1.3: PUT YOUR CODE HERE
-        pass
+        hit_data = self.scene.closest_hit(ray)
+
+        if not hit_data.has_hit:
+            return BLACK
+
+        normal = hit_data.normal
+        normal = Normalize(normal) # not necessary, but to be safe
+        color_components = (normal + ONE) / 2
+        return RGBColor(color_components.x, color_components.y, color_components.z)
 
 
 class PhongIntegrator(Integrator):
