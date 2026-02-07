@@ -291,7 +291,47 @@ class CosineLobe(Function):
     def get_integral(self):
         return 2 * pi / (self.exp + 1)
 
+class ArchEnvMap(Function):
+    def __init__(self):
+        self.env_map = EnvironmentMap('env_maps/arch_nozero.hdr')
+        integral = self.get_integral()
+        super().__init__(integral)
 
+    def eval(self, omega_i):
+        color = self.env_map.getValue(omega_i)
+        # Convert RBG to scalar value
+        return 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b 
+
+    def get_integral(self):
+        integral = 0.0
+        
+        for ty in range(self.env_map.height):
+            for tx in range(self.env_map.width):
+                # Convert pixel to lat-long coordinates
+                u = tx / (self.env_map.width - 1)
+                v = ty / (self.env_map.height - 1)
+                
+                # Convert to spherical coordinates
+                phi = 2 * PI * u
+                theta = PI * v
+                
+                # Convert to direction vector
+                omega = Vector3D(sin(theta) * sin(phi), cos(theta), -sin(theta) * cos(phi))
+                
+                # Check if direction is hemisphere (0, 1, 0)
+                if omega.y > 0:
+                    res = self.env_map.env_map_hdr[ty, tx, :]
+                    L = 0.2126 * res[0] + 0.7152 * res[1] + 0.0722 * res[2]
+                    
+                    # Compute solid angle of pixel
+                    d_phi = 2 * PI / self.env_map.width
+                    d_theta = PI / self.env_map.height
+                    d_omega = sin(theta) * d_theta * d_phi
+                    
+                    # l_o = l_i * brdf * cos(theta) * d_omega (assumed brdf = 1)
+                    integral += L * cos(theta) * d_omega
+        
+        return integral
 # -------------------------------------------------Base class for pdfs oer the hemisphere 2*pi
 class PDF(ABC):
 

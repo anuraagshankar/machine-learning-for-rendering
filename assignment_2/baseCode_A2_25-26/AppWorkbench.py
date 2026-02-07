@@ -48,8 +48,8 @@ n_methods = len(methods_label) # number of tested monte carlo methods
 # Set up the function we wish to integrate                 #
 # We will consider integrals of the form: L_i * brdf * cos #
 # ######################################################## #
-# l_i = ArchEnvMap()
-l_i = Constant(1)
+l_i = ArchEnvMap()
+# l_i = Constant(1)
 kd = 1
 brdf = Constant(kd)
 cosine_term = CosineLobe(1)
@@ -68,7 +68,8 @@ uniform_pdf = UniformPDF()
 # Compute/set the ground truth value of the integral we want to estimate #
 # NOTE: in practice, when computing an image, this value is unknown      #
 # ###################################################################### #
-ground_truth = cosine_term.get_integral()  # Assuming that L_i = 1 and BRDF = 1
+# ground_truth = cosine_term.get_integral()  # Assuming that L_i = 1 and BRDF = 1
+ground_truth = l_i.get_integral() # Included brdf and cosine term in the integral function
 print('Ground truth: ' + str(ground_truth))
 
 
