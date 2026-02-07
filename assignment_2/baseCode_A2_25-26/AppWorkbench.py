@@ -23,6 +23,7 @@ def collect_samples(function_list, sample_pos_):
 # this function returns the classic Monte Carlo (cmc) estimate of the integral.               #
 # ########################################################################################### #
 def compute_estimate_cmc(sample_prob_, sample_values_):
+    # CMC Estimate: 1/N * sum(f(x_i) / p(x_i))
     estimate = 0
     for val, prob in zip(sample_values_, sample_prob_):
         estimate += val.r / prob
@@ -47,7 +48,7 @@ n_methods = len(methods_label) # number of tested monte carlo methods
 # Set up the function we wish to integrate                 #
 # We will consider integrals of the form: L_i * brdf * cos #
 # ######################################################## #
-#l_i = ArchEnvMap()
+# l_i = ArchEnvMap()
 l_i = Constant(1)
 kd = 1
 brdf = Constant(kd)
@@ -95,12 +96,14 @@ for k, ns in enumerate(ns_vector):
 
     print(f'Computing estimates using {ns} samples')
 
+    # Stores the absolute errors for each estimate
     errors = []
     for _ in range(n_estimates):
         samples_pos = []
         samples_prob = []
 
         for i in range(ns):
+            # Obtain random numbers to generate a sample direction
             u1, u2 = np.random.rand(), np.random.rand()
             omega_i = uniform_pdf.generate_dir(u1, u2)
             samples_pos.append(omega_i)
@@ -111,6 +114,7 @@ for k, ns in enumerate(ns_vector):
         abs_error = abs(ground_truth - estimate_cmc)
         errors.append(abs_error)
         
+    # Compute the average error for the current sample count
     results[k, 0] = np.mean(errors)
 
 # ################################################################################################# #

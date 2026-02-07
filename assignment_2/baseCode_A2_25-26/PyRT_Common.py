@@ -233,7 +233,7 @@ class EnvironmentMap:
     def __init__(self, env_map_path):
         # IMREAD_ANYDEPTH is needed because even though the data is stored in 8-bit channels
         # when it's read into memory it's represented at a higher bit depth
-        self.env_map_hdr = cv2.imread(env_map_path, flags=cv2.IMREAD_ANYDEPTH)
+        self.env_map_hdr = cv2.imread(env_map_path, flags=cv2.IMREAD_ANYDEPTH | cv2.IMREAD_COLOR)
         self.env_map_hdr = cv2.cvtColor(self.env_map_hdr, cv2.COLOR_RGB2BGR)
         self.height = self.env_map_hdr.shape[0]
         self.width = self.env_map_hdr.shape[1]

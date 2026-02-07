@@ -163,7 +163,50 @@ class CMCIntegrator(Integrator):  # Classic Monte Carlo Integrator
         self.n_samples = n
 
     def compute_color(self, ray):
-        pass
+        hit_data = self.scene.closest_hit(ray)
+
+        # If no hit, return the environment map value or black
+        if not hit_data.has_hit:
+            if self.scene.env_map is not None:
+                return self.scene.env_map.getValue(ray.d)
+            else:
+                return BLACK
+
+        # Obtain the BRDF of the hit object
+        hit_object = self.scene.object_list[hit_data.primitive_index]
+        brdf = hit_object.get_BRDF().kd
+
+        # Generate sample set and probabilities
+        pdf = UniformPDF()
+        sample_set, sample_prob = sample_set_hemisphere(self.n_samples, pdf)
+        samples_values = []
+
+        for omega_j in sample_set:
+            # Center the sample direction around the normal
+            omega_jbar = center_around_normal(omega_j, hit_data.normal)
+            r = Ray(hit_data.hit_point, omega_jbar)
+
+            # Check if the ray hits an object
+            r_hit = self.scene.closest_hit(r)
+            # If the ray hits an object, get the emission of the object
+            if r_hit.has_hit:
+                hit_object = self.scene.object_list[r_hit.primitive_index]
+                l_i = hit_object.emission
+            # If no hit, return the environment map value or black
+            elif self.scene.env_map is not None:
+                l_i = self.scene.env_map.getValue(omega_jbar)
+            else:
+                l_i = BLACK
+
+            # l_o = l_i * brdf * cos(theta)
+            l_o = l_i.multiply(brdf) * Dot(hit_data.normal, omega_jbar)
+            samples_values.append(l_o)
+        
+        # Compute the CMC estimate
+        result = RGBColor(0, 0, 0)
+        for val, prob in zip(samples_values, sample_prob):
+            result += val / prob
+        return result / len(samples_values)
 
 
 class BayesianMonteCarloIntegrator(Integrator):
