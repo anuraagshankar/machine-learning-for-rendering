@@ -152,7 +152,7 @@ env_map_path = 'env_maps/arch_nozero.hdr'
 
 # -------------------------------------------------Main
 # Create Integrator
-integrator = CMCIntegrator(40, DIRECTORY + FILENAME)
+integrator = CMCIntegrator(10, DIRECTORY + FILENAME)
 
 # Create the scene
 scene = sphere_scene(envMap=env_map_path)
@@ -161,15 +161,16 @@ scene = sphere_scene(envMap=env_map_path)
 # Attach the scene to the integrator
 integrator.add_scene(scene)
 
-# Render!
-start_time = time.time()
-integrator.render()
-end_time = time.time() - start_time
-print("--- Rendering time: %s seconds ---" % end_time)
+if __name__ == "__main__":
+    # Render!
+    start_time = time.time()
+    integrator.render()
+    end_time = time.time() - start_time
+    print("--- Rendering time: %s seconds ---" % end_time)
 
-# -------------------------------------------------open saved npy image
-image_nd_array = np.load(integrator.get_filename() + '.npy')
-tonemapper = cv2.createTonemap(gamma=2.5)
-image_nd_array_ldr = tonemapper.process(image_nd_array.astype(np.single)) * 255.0
-cv2.imshow('PyRT - Python Ray Tracer for MLR', cv2.cvtColor(image_nd_array_ldr.astype(np.uint8), cv2.COLOR_BGR2RGB))
-cv2.waitKey(0)
+    # -------------------------------------------------open saved npy image
+    image_nd_array = np.load(integrator.get_filename() + '.npy')
+    tonemapper = cv2.createTonemap(gamma=2.5)
+    image_nd_array_ldr = tonemapper.process(image_nd_array.astype(np.single)) * 255.0
+    cv2.imshow('PyRT - Python Ray Tracer for MLR', cv2.cvtColor(image_nd_array_ldr.astype(np.uint8), cv2.COLOR_BGR2RGB))
+    cv2.waitKey(0)
